@@ -1,7 +1,8 @@
+
 ---
-- name: Search restic, status 
+- name: Search restic, resticprofile
   hosts: all
-  gather_facts: false
+  gather_facts: true  #Включаем сбор фактов, чтобы получить IP-адреса
 
   tasks:
     - name: Search restic in /usr/bin
@@ -10,17 +11,17 @@
         patterns: restic
       register: found_restic
 
-    - name: restic files
-      debug:
-        msg: "restic {{ 'find' if found_restic.files else 'not find' }} in /usr/bin"
-
-    - name: cmd restic
+    - name: Command restic
       ansible.builtin.command:
-        cmd: resticprofile status
+        cmd: restic
       register: restic_command_output
       when: found_restic.files
 
-    - name: output restic
-      ansible.builtin.debug:
-        var: restic_command_output.stdout_lines
+    - name: Save report to file
+      ansible.builtin.lineinfile:
+        path: /tmp/file01.txt
+        line: |
+          [{{ inventory_hostname }} ({{ ansible_host }})]
+          {{ restic_command_output.stdout | default("Нет вывода") }} #Если закоментить данную строку то получим только IP-адреса машин, где присутвует resticprofile
+      delegate_to: localhost
       when: found_restic.files
