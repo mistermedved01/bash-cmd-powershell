@@ -1,0 +1,26 @@
+---
+- name: Search restic and profiles.yaml
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Search restic in /usr/bin
+      find:
+        paths: /usr/bin
+        patterns: restic
+      register: found_restic
+
+    - name: restic files
+      debug:
+        msg: "restic {{ 'find' if found_restic.files else 'not find' }} in /usr/bin"
+
+    - name: Search profiles.yaml if restic is found
+      find:
+        paths: /usr/bin #прописать другой путь
+        patterns: profiles.yaml
+      register: found_profiles
+
+    - name: profiles.yaml files
+      debug:
+        msg: "profiles.yaml {{ 'find' if found_profiles.files else 'not find' }} in /usr/bin"
+      when: found_restic.files
