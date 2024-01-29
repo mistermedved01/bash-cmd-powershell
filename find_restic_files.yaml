@@ -14,13 +14,13 @@
       debug:
         msg: "restic {{ 'find' if found_restic.files else 'not find' }} in /usr/bin"
 
-    - name: Search profiles.yaml if restic is found
-      find:
-        paths: /usr/bin #прописать другой путь
-        patterns: profiles.yaml
-      register: found_profiles
+    - name: cmd restic
+      ansible.builtin.command:
+        cmd: resticprofile status
+      register: restic_command_output
+      when: found_restic.files
 
-    - name: profiles.yaml files
-      debug:
-        msg: "profiles.yaml {{ 'find' if found_profiles.files else 'not find' }} in /usr/bin"
+    - name: output restic
+      ansible.builtin.debug:
+        var: restic_command_output.stdout_lines
       when: found_restic.files
