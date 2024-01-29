@@ -1,5 +1,5 @@
 ---
-- name: Search restic and profiles.yaml
+- name: Search restic, status 
   hosts: all
   gather_facts: false
 
